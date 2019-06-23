@@ -45,9 +45,29 @@ public class MainActivity extends AppCompatActivity {
         btn_choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent();
-                intent.setType("application/pdf");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
+
+                String[] mimeTypes =
+                        {"application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .doc & .docx
+                                "application/vnd.ms-powerpoint","application/vnd.openxmlformats-officedocument.presentationml.presentation", // .ppt & .pptx
+                                "application/vnd.ms-excel","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xls & .xlsx
+                                "text/plain",
+                                "application/pdf",
+                                "application/zip"};
+
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    intent.setType(mimeTypes.length == 1 ? mimeTypes[0] : "*/*");
+                    if (mimeTypes.length > 0) {
+                        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+                    }
+                } else {
+                    String mimeTypesStr = "";
+                    for (String mimeType : mimeTypes) {
+                        mimeTypesStr += mimeType + "|";
+                    }
+                    intent.setType(mimeTypesStr.substring(0,mimeTypesStr.length() - 1));
+                }
+
                 startActivityForResult(Intent.createChooser(intent, "Select Pdf"), PICK_PDF_REQUEST);
             }
         });
